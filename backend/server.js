@@ -17,14 +17,6 @@ app.use(cors());
 
 // Connect to MongoDB
 connectDB(); // Ensure your `dataconection.js` exports a `connectDB` function
-
-// Cloudinary Initialization
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
 // Main API Routes
 app.use('/api', indexRoutes);
 
