@@ -1,0 +1,134 @@
+/* Body styling with dynamic scrolling tech wallpaper */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    overflow: hidden;
+  }
+  
+  .dynamic-background {
+    height: 100vh;
+    width: 100vw;
+    background: url('https://elearningindustry.com/wp-content/uploads/2022/11/shutterstock_1798672534.jpg') center/cover no-repeat;
+    position: relative;
+    animation: scroll-bg 25s linear infinite; /* Adjust scrolling speed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-attachment: fixed; /* Fixed background for the dynamic effect */
+  }
+  
+  @keyframes scroll-bg {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 0 -100px; /* Adjust to make the scrolling effect smoother */
+    }
+  }
+  
+  /* Login container */
+  .login-container {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 400px;
+    padding: 30px;
+    text-align: center;
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .college-logo {
+    font-size: 40px;
+    margin-right: 10px;
+  }
+  
+  h1 {
+    font-size: 24px;
+    color: #0056b3;
+    margin: 0;
+  }
+  
+  h2 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  /* Input container with hover effect */
+  .input-container {
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  
+  .input-container label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #555;
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+  }
+  
+  input:hover {
+    border-color: #0056b3;
+    box-shadow: 0 0 5px rgba(0, 86, 179, 0.3);
+    transform: scale(1.02);
+  }
+  
+  input:focus {
+    border-color: #00408a;
+    outline: none;
+    box-shadow: 0 0 8px rgba(0, 64, 138, 0.5);
+  }
+  
+  /* Login button styling */
+  .login-btn {
+    background: #0056b3;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .login-btn:hover {
+    background: #00408a;
+    box-shadow: 0 3px 6px rgba(0, 64, 138, 0.3);
+  }
+  
+  .login-btn:active {
+    background: #003366;
+  }
+  
+  /* Responsive styling */
+  @media (max-width: 768px) {
+    .login-container {
+      width: 90%;
+      padding: 20px;
+    }
+  
+    h1 {
+      font-size: 20px;
+    }
+  
+    h2 {
+      font-size: 18px;
+    }
+  }
+  

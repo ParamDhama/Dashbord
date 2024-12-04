@@ -1,0 +1,347 @@
+/* Admin Dashboard Styling */
+.dashboard-container {
+  font-family: Arial, sans-serif;
+  background: #f8f8f8;
+  min-height: 100vh;
+}
+
+/* Navbar Styling */
+.navbar {
+  background-color: #333;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+  color: white;
+  align-items: center;
+}
+
+.navbar-left .logo {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.search-container input {
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  margin-right: 20px;
+}
+
+.search-container input:focus {
+  outline: none;
+  border-color: #0056b3;
+}
+
+.profile-icon img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 20px;
+}
+
+.logout-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background-color: #e31b0c;
+}
+
+/* Employee List */
+.employee-list {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+}
+
+.employee-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.employee-list li {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+/* Add User Button */
+.add-user-button-container {
+  margin-top: 20px;
+  text-align: right;
+}
+
+.add-user-btn {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.add-user-btn:hover {
+  background-color: #45a049;
+}
+
+/* Modal Styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 40px;
+  border-radius: 8px;
+  width: 400px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.input-container {
+  margin-bottom: 10px;
+}
+
+.input-container input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.input-container input:focus {
+  outline: none;
+  border-color: #0056b3;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+}
+/* /// */
+.user-form{
+  display: flex;
+  flex-direction: column;
+  gap:10px;
+}
+.course-name{
+  width:max-content;
+  display: flex;
+  justify-content: start;
+  
+}
+.gender-options{
+  width: max-content;
+  display: flex;
+  justify-content: start;
+}
+.gender-section,.course-section{
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.submit-btn,
+.cancel-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.submit-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+}
+
+.cancel-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+}
+
+.submit-btn:hover {
+  background-color: #45a049;
+}
+
+.cancel-btn:hover {
+  background-color: #e31b0c;
+}
+
+/* Media Queries for Responsiveness */
+
+/* For Tablets (600px to 768px) */
+@media (max-width: 768px) {
+  .navbar-left .logo {
+    font-size: 18px;
+  }
+
+  .navbar-right {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 10px;
+  }
+
+  .search-container input {
+    margin-bottom: 10px;
+    width: 100%;
+  }
+
+  .profile-icon img {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+  }
+
+  .logout-btn {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .add-user-button-container {
+    text-align: left;
+  }
+
+  .employee-list {
+    margin-top: 10px;
+    padding: 15px;
+  }
+
+  .add-user-btn {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .modal-content {
+    width: 90%;
+  }
+
+  .input-container input {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .submit-btn,
+  .cancel-btn {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}
+
+/* For Mobile (max-width: 600px) */
+@media (max-width: 600px) {
+  .navbar {
+    padding: 10px;
+  }
+
+  .navbar-left .logo {
+    font-size: 16px;
+  }
+
+  .navbar-right {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 10px;
+  }
+
+  .search-container input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .profile-icon img {
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+  }
+
+  .logout-btn {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .add-user-button-container {
+    text-align: left;
+  }
+
+  .employee-list {
+    margin-top: 10px;
+    padding: 15px;
+  }
+
+  .add-user-btn {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .modal-content {
+    width: 90%;
+  }
+
+  .input-container input {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .submit-btn,
+  .cancel-btn {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}
+
+/* For Extra Small Devices (max-width: 400px) */
+@media (max-width: 400px) {
+  .navbar-left .logo {
+    font-size: 14px;
+  }
+
+  .navbar-right {
+    align-items: flex-start;
+  }
+
+  .search-container input {
+    font-size: 12px;
+  }
+
+  .profile-icon img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .add-user-btn {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+
+  .submit-btn,
+  .cancel-btn {
+    font-size: 12px;
+    padding: 8px 14px;
+  }
+
+  .modal-content {
+    width: 90%;
+  }
+}
