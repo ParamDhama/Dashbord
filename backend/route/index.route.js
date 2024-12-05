@@ -12,4 +12,6 @@ router.use('/signup', authenticateToken, signupControllerRoutes);
 // Define the /login route
 router.use('/login', loginRoutes.login);
 
+router.use('/register', loginRoutes.signup);
+
 module.exports = router;

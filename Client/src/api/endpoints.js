@@ -1,9 +1,8 @@
 // src/api/endpoints.js
 
 const endpoints = {
-    LOGIN: "/api/login", // Login endpoint
-    
-  };
+  LOGIN: "/api/login", // Login endpoint
   
-  export default endpoints;
-  
+};
+
+export default endpoints;

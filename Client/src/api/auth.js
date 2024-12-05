@@ -1,16 +1,16 @@
 import endpoints from "./endpoints";
 import apiClient from "./apiClient";
 
-export const loginUser = async (userName, passwordValue) => {
+export const loginUser = async (userName, password) => {
   try {
-    if (!userName || !passwordValue) {
+    if (!userName || !password) {
       throw "Username and password are required.";
     }
 
     console.log("Sending API request with:", { userName, password: "" }); // Mask password in logs
 
     // Make the API request
-    const response = await apiClient.post(endpoints.LOGIN, { userName, passwordValue });
+    const response = await apiClient.post(endpoints.LOGIN, { userName, password });
     debugger
     if (response?.data) {
       const token = response?.data?.user?.token;

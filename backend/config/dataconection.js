@@ -1,4 +1,3 @@
-// config/dataconnection.js
 const mongoose = require('mongoose');
 require('dotenv').config(); // Load environment variables from .env
 
@@ -10,11 +9,8 @@ const connectDB = async () => {
       throw new Error("MONGO_URI is not defined in the environment variables");
     }
 
-    // Connect to MongoDB
-    await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    // Connect to MongoDB without deprecated options
+    await mongoose.connect(uri);
 
     console.log('MongoDB connected successfully');
   } catch (error) {
