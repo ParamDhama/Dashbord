@@ -1,4 +1,5 @@
-const { generateToken, encryptPassword } = require('../middleware/middleware');  // Import the generateToken function
+const { v4: uuidv4 } = require('uuid'); // Import uuidv4
+const { generateToken, encryptPassword } = require('../middleware/middleware'); // Import generateToken and encryptPassword
 const login = require('../models/login');
 
 exports.login = async (req, res) => {
@@ -25,40 +26,41 @@ exports.login = async (req, res) => {
 };
 
 exports.signup = async (req, res) => {
-  const { userName, passwordValue, email } = req.body; // Expecting these fields in the request body
- 
+  const { userName, passwordValue, email } = req.body; // Removed userId from body
+
   try {
-  // Check if the user already exists
-  const existingUser = await login.findOne({ $or: [{ userName }] });
-  console.log(existingUser)
-  if (existingUser) {
-  return res.status(400).json({ message: 'Username or email already exists' });
-  }
- 
-  // Encrypt the password
-  const encryptedPassword = encryptPassword(passwordValue);
- 
-  // Create the new user
-  const newUser = new login({
-  userName,
-  email,
-  password: encryptedPassword,
-  });
- 
-  // Save the user in the database
-  await newUser.save();
- 
-  // Generate a token for the new user
-  const token = generateToken(newUser);
- 
-  // Add the token to the response
-  newUser._doc.token = token;
- 
-  return res.status(201).json({
-  message: 'Signup successful',
-  user: newUser, // Return the user details and token
-  });
+    // Check if the user already exists
+    const existingUser = await login.findOne({ $or: [{ userName }] });
+    console.log(existingUser);
+    if (existingUser) {
+      return res.status(400).json({ message: 'Username or email already exists' });
+    }
+
+    // Encrypt the password
+    const encryptedPassword = encryptPassword(passwordValue);
+
+    // Create the new user with a unique userId
+    const newUser = new login({
+      userId: uuidv4(), // Generate a unique userId
+      userName,
+      email,
+      password: encryptedPassword,
+    });
+
+    // Save the user in the database
+    await newUser.save();
+
+    // Generate a token for the new user
+    const token = generateToken(newUser);
+
+    // Add the token to the response
+    newUser._doc.token = token;
+
+    return res.status(201).json({
+      message: 'Signup successful',
+      user: newUser, // Return the user details and token
+    });
   } catch (err) {
-  return res.status(500).json({ message: 'Server error', error: err.message });
+    return res.status(500).json({ message: 'Server error', error: err.message });
   }
- };
+};
