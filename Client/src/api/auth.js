@@ -10,8 +10,10 @@ export const loginUser = async (userName, password) => {
     console.log("Sending API request with:", { userName, password: "" }); // Mask password in logs
 
     // Make the API request
-    const response = await apiClient.post(endpoints.LOGIN, { userName, password });
-    debugger
+    const response = await apiClient.post(endpoints.LOGIN, {
+      userName,
+      password,
+    });
     if (response?.data) {
       const token = response?.data?.user?.token;
       const userId = response?.data?.user?.userId;
@@ -30,7 +32,9 @@ export const loginUser = async (userName, password) => {
         throw "Too many login attempts. Please try again later.";
       }
 
-      throw error.response.data?.message || "Invalid credentials. Please try again.";
+      throw (
+        error.response.data?.message || "Invalid credentials. Please try again."
+      );
     }
 
     console.error("Unexpected Error in loginUser:", error.message);
@@ -38,14 +42,67 @@ export const loginUser = async (userName, password) => {
   }
 };
 
+export const addUser = async (data) => {
+  try {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      throw new Error("Authorization token is missing");
+    }
+
+    // Set the Authorization header
+    const response = await apiClient.post(endpoints.ADD_USER, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    console.log("API response:", response.data); // Debug log
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      console.error("Server Error in add user:", error.response.data);
+    }
+  }
+};
+
+export const fetchUsers = async (queryParams = {}) => {
+  try {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      throw new Error("Authorization token is missing");
+    }
+
+    // Transform queryParams into a query string
+    const queryString = new URLSearchParams(queryParams).toString();
+    const endpointWithParams = `${endpoints.GET_USER}?${queryString}`;
+
+    // Set the Authorization header
+    const response = await apiClient.get(endpointWithParams, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if(response) {
+      return response;
+    }
+  } catch (error) {
+    if (error.response) {
+      console.error("Server Error in fetch users:", error.response.data);
+    } else {
+      console.error("Error in fetch users:", error.message);
+    }
+  }
+};
+
+
 const setAuthData = (token, userId, userName, user) => {
-  localStorage.setItem('authToken', token);        // Store token
-  localStorage.setItem('userId', userId);          // Store user ID
-  localStorage.setItem('userName', userName);      // Store user name
-  localStorage.setItem('user', JSON.stringify(user)); // Store entire user object
+  localStorage.setItem("authToken", token); // Store token
+  localStorage.setItem("userId", userId); // Store user ID
+  localStorage.setItem("userName", userName); // Store user name
+  localStorage.setItem("user", JSON.stringify(user)); // Store entire user object
 };
 
 export const getAuthToken = () => {
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem("authToken");
   return token;
 };

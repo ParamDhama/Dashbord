@@ -72,6 +72,8 @@ const AdminDashboard = () => {
   });
   const [showModal, setShowModal] = useState(false);
 
+  console.log(newUser, 'hii')
+
   useEffect(() => {
     const fetchEmployees = async () => {
       try {

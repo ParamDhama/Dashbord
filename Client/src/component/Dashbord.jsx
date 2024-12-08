@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashbord.css";
+import axios from "axios";
+import { addUser, fetchUsers } from "../api/auth";
 
 // Dummy data for the search feature
 const employees = [
@@ -11,7 +13,7 @@ const employees = [
 
 function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredEmployees, setFilteredEmployees] = useState(employees);
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [profileImage, setProfileImage] = useState(
     "https://via.placeholder.com/40" // Placeholder for profile image
   );
@@ -24,6 +26,19 @@ function AdminDashboard() {
     profileImage: null,
   });
   const navigate = useNavigate();
+
+  const fetchEmployees = async () => {
+    try {
+      const response = await fetchUsers();
+      setFilteredEmployees(response.data);
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
 
   useEffect(() => {
     // Filter employees based on the search query
@@ -56,11 +71,10 @@ function AdminDashboard() {
     }); // Reset form
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async(e) => {
     e.preventDefault();
-    // Process the new user (e.g., send to backend or add to the list)
-    console.log("New User Added:", newUser);
-    // After adding, close the modal
+    const response = await addUser(newUser)//axios.post("/api/employees", newUser);
+    fetchEmployees();
     setShowModal(false);
     setNewUser({
       name: "",
@@ -132,9 +146,10 @@ function AdminDashboard() {
       <div className="employee-list">
         <h2>Employees</h2>
         <ul>
-          {filteredEmployees.length > 0 ? (
-            filteredEmployees.map((emp) => (
-              <li key={emp.id}>
+          {filteredEmployees?.length > 0 ? (
+            filteredEmployees.map((emp, index) => (
+              <li key={index}>
+                <span><b>{index + 1} {". "}</b></span>
                 <span>{emp.name}</span> - <span>{emp.email}</span>
               </li>
             ))
@@ -174,6 +189,17 @@ function AdminDashboard() {
                 />
               </div>
 
+              <div className="input-container">
+                <input
+                  type="number"
+                  placeholder="Mobile Number"
+                  name="mobile"
+                  value={newUser.mobile}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
               {/* Designation Dropdown */}
               <div className="input-container">
                 <select
@@ -183,7 +209,7 @@ function AdminDashboard() {
                   required
                 >
                   <option value="">Select Designation</option>
-                  <option value="HR">HR</option>
+                  <option value="Hr">Hr</option>
                   <option value="Manager">Manager</option>
                   <option value="Sales">Sales</option>
                 </select>
@@ -228,11 +254,11 @@ function AdminDashboard() {
               <div className="gender-section">
                 <label>Gender</label>
                 <div className="gender-options">
-                  <input type='radio' id="male" name="gender" value="male" />
+                  <input type='radio' id="male" name="gender" value="male" onChange={handleInputChange}/>
                   <label htmlFor="male">Male</label>
                 </div>
                 <div className="gender-options">
-                  <input type='radio' id="female" name="gender" value="female" />
+                  <input type='radio' id="female" name="gender" value="female" onChange={handleInputChange}/>
                   <label htmlFor="female">Female</label>
                 </div>
               </div>
