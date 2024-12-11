@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashbord.css";
-import axios from "axios";
 import { addUser, fetchUsers } from "../api/auth";
 
-// Dummy data for the search feature
 const employees = [
   { name: "John Doe", email: "john@demo.com", id: 1 },
   { name: "Jane Smith", email: "jane@demo.com", id: 2 },
@@ -15,16 +13,18 @@ function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [profileImage, setProfileImage] = useState(
-    "https://via.placeholder.com/40" // Placeholder for profile image
+    "https://via.placeholder.com/40"
   );
   const [showModal, setShowModal] = useState(false);
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
+    mobile: "",
     designation: "",
     courses: [],
     profileImage: null,
   });
+
   const navigate = useNavigate();
 
   const fetchEmployees = async () => {
@@ -41,7 +41,6 @@ function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    // Filter employees based on the search query
     setFilteredEmployees(
       employees.filter(
         (emp) =>
@@ -52,37 +51,43 @@ function AdminDashboard() {
   }, [searchQuery]);
 
   const handleLogout = () => {
-    // Perform logout (clear session, redirect to login)
     navigate("/login");
   };
 
   const handleAddUserClick = () => {
-    setShowModal(true); // Open modal
+    setShowModal(true);
   };
 
   const handleCloseModal = () => {
-    setShowModal(false); // Close modal
-    setNewUser({
-      name: "",
-      email: "",
-      designation: "",
-      courses: [],
-      profileImage: null,
-    }); // Reset form
-  };
-
-  const handleFormSubmit = async(e) => {
-    e.preventDefault();
-    const response = await addUser(newUser)//axios.post("/api/employees", newUser);
-    fetchEmployees();
     setShowModal(false);
     setNewUser({
       name: "",
       email: "",
+      mobile: "",
       designation: "",
       courses: [],
       profileImage: null,
-    }); // Reset form
+    });
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await addUser(newUser);
+      fetchEmployees();
+      alert("User added successfully!"); // Success alert
+      setShowModal(false);
+      setNewUser({
+        name: "",
+        email: "",
+        mobile: "",
+        designation: "",
+        courses: [],
+        profileImage: null,
+      });
+    } catch (error) {
+      alert("Failed to add user. Please try again."); // Error alert
+    }
   };
 
   const handleInputChange = (e) => {
@@ -112,7 +117,6 @@ function AdminDashboard() {
 
   return (
     <div className="dashboard-container">
-      {/* Navbar with Profile Image Icon and Search Bar */}
       <nav className="navbar">
         <div className="navbar-left">
           <div className="logo">Admin Dashboard</div>
@@ -135,21 +139,21 @@ function AdminDashboard() {
         </div>
       </nav>
 
-      {/* Add User Button */}
       <div className="add-user-button-container">
         <button className="add-user-btn" onClick={handleAddUserClick}>
           Add User
         </button>
       </div>
 
-      {/* Employee List Section */}
       <div className="employee-list">
         <h2>Employees</h2>
         <ul>
           {filteredEmployees?.length > 0 ? (
             filteredEmployees.map((emp, index) => (
               <li key={index}>
-                <span><b>{index + 1} {". "}</b></span>
+                <span>
+                  <b>{index + 1} {". "}</b>
+                </span>
                 <span>{emp.name}</span> - <span>{emp.email}</span>
               </li>
             ))
@@ -159,13 +163,11 @@ function AdminDashboard() {
         </ul>
       </div>
 
-      {/* Modal Form for Adding User */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h2>Add New User</h2>
             <form onSubmit={handleFormSubmit} className="user-form">
-              {/* Name Input */}
               <div className="input-container">
                 <input
                   type="text"
@@ -177,7 +179,6 @@ function AdminDashboard() {
                 />
               </div>
 
-              {/* Email Input */}
               <div className="input-container">
                 <input
                   type="email"
@@ -191,16 +192,18 @@ function AdminDashboard() {
 
               <div className="input-container">
                 <input
-                  type="number"
+                  type="tel"
                   placeholder="Mobile Number"
                   name="mobile"
                   value={newUser.mobile}
                   onChange={handleInputChange}
+                  pattern="[0-9]{10}"
                   required
+                  maxLength="10"
+                  title="Please enter a valid 10-digit mobile number"
                 />
               </div>
 
-              {/* Designation Dropdown */}
               <div className="input-container">
                 <select
                   name="designation"
@@ -214,7 +217,6 @@ function AdminDashboard() {
                   <option value="Sales">Sales</option>
                 </select>
               </div>
-
 
               <div className="course-section">
                 <label>Courses</label>
@@ -251,19 +253,31 @@ function AdminDashboard() {
                   </div>
                 </div>
               </div>
+
               <div className="gender-section">
                 <label>Gender</label>
                 <div className="gender-options">
-                  <input type='radio' id="male" name="gender" value="male" onChange={handleInputChange}/>
+                  <input
+                    type="radio"
+                    id="male"
+                    name="gender"
+                    value="male"
+                    onChange={handleInputChange}
+                  />
                   <label htmlFor="male">Male</label>
                 </div>
                 <div className="gender-options">
-                  <input type='radio' id="female" name="gender" value="female" onChange={handleInputChange}/>
+                  <input
+                    type="radio"
+                    id="female"
+                    name="gender"
+                    value="female"
+                    onChange={handleInputChange}
+                  />
                   <label htmlFor="female">Female</label>
                 </div>
               </div>
 
-              {/* Profile Image Upload */}
               <div className="input-container">
                 <label>Profile Image</label>
                 <input
@@ -274,7 +288,6 @@ function AdminDashboard() {
                 />
               </div>
 
-              {/* Modal Actions */}
               <div className="modal-actions">
                 <button type="submit" className="submit-btn">
                   Add User
