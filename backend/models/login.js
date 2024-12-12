@@ -1,6 +1,6 @@
 // models/Login.js
 const mongoose = require('mongoose');
-const baseSchema = require('./BaseSchema');
+const baseSchema = require('./baseSchema');
 
 const loginSchema = new mongoose.Schema({
   userId: { type: String, required: false, unique: true },
