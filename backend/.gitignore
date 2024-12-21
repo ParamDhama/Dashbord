@@ -1,2 +1,39 @@
-/env
+# Environment files
+.env
+# Reason: Contains sensitive configuration details (e.g., API keys, database credentials) that should not be exposed publicly.
+
+# Node.js dependencies
 /node_modules
+# Reason: These are large directories generated during dependency installation. They can be restored using `npm install` or `yarn install`.
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+# Reason: Logs generated during application runtime or debugging are not necessary to commit and may contain sensitive information.
+
+# Build files
+/build
+/dist
+# Reason: Build and distribution directories are output from the build process and should not be version controlled. They can be regenerated as needed.
+
+# Temporary files
+/tmp
+/temp
+# Reason: Temporary files generated during runtime or by the system should not be included in the repository.
+
+# IDE-specific files
+.vscode/
+.idea/
+# Reason: These contain IDE-specific configurations and are not relevant to the project source code.
+
+# System files
+.DS_Store
+Thumbs.db
+# Reason: These are OS-specific files and are not necessary for the project.
+
+# Testing
+/coverage
+# Reason: Coverage reports generated during tests are large and should be excluded from version control.

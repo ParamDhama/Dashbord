@@ -1,23 +1,28 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
+# Node.js dependencies
 /node_modules
 /.pnp
 .pnp.js
+# Reason: These directories and files are generated during dependency installation and are not needed in version control. They can be restored by running `npm install` or `yarn install`.
 
-# testing
+# Testing coverage reports
 /coverage
+# Reason: Coverage reports are generated during testing and should not be included in version control. These are typically large files and can be recreated as needed.
 
-# production
+# Production build output
 /build
+# Reason: The production build files are generated and should not be committed. These can be rebuilt using the build scripts.
 
-# misc
+# Operating system and IDE-specific files
 .DS_Store
+# Reason: MacOS creates .DS_Store files to store custom attributes of a folder. These are not relevant to the project.
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+# Reason: These environment files contain sensitive information (e.g., API keys, secrets) and are specific to individual environments.
 
+# Debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+# Reason: Debug log files are generated during npm or yarn runs when errors occur. They are useful locally for debugging but should not be version controlled.

@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Dashbord.css";
+import "./Dashboard.css";
 import { addUser, fetchUsers } from "../api/auth";
 
+// Dummy data for the search feature (for local testing)
 const employees = [
   { name: "John Doe", email: "john@demo.com", id: 1 },
   { name: "Jane Smith", email: "jane@demo.com", id: 2 },
   { name: "Sam Adams", email: "sam@demo.com", id: 3 },
 ];
 
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/jpg"];
+const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2 MB
+
 function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredEmployees, setFilteredEmployees] = useState([]);
-  const [profileImage, setProfileImage] = useState(
-    "https://via.placeholder.com/40"
-  );
+  const [profileImage, setProfileImage] = useState("https://via.placeholder.com/40");
   const [showModal, setShowModal] = useState(false);
   const [newUser, setNewUser] = useState({
     name: "",
@@ -22,71 +23,89 @@ function AdminDashboard() {
     mobile: "",
     designation: "",
     courses: [],
+    gender: "",
     profileImage: null,
   });
-
+  const [users, setUsers] = useState([]); // State to store fetched users
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(""); // Error state
   const navigate = useNavigate();
 
-  const fetchEmployees = async () => {
-    try {
-      const response = await fetchUsers();
-      setFilteredEmployees(response.data);
-    } catch (error) {
-      console.error("Error fetching employees:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
-
-  useEffect(() => {
-    setFilteredEmployees(
-      employees.filter(
-        (emp) =>
-          emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          emp.email.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    );
-  }, [searchQuery]);
-
+  // Logout function
   const handleLogout = () => {
     navigate("/login");
   };
 
-  const handleAddUserClick = () => {
-    setShowModal(true);
-  };
+  // Fetch users on component mount
+  useEffect(() => {
+    const getUsers = async () => {
+      try {
+        setLoading(true);
+        const response = await fetchUsers();
+        console.log("API Response:", response.employees); // Log response for debugging
+        if (response && response.employees) {
+          setUsers(response.employees); // Assuming `response.data.employees` contains an array of user objects
+        } else {
+          setUsers([]); // No employees found
+        }
+      } catch (err) {
+        setError("Failed to fetch users. Please try again.");
+        console.error("Fetch Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    getUsers();
+  }, []);
+
+  // Search filter logic
+  const filteredEmployees = users.filter(
+    (user) => user.name.toLowerCase().includes(searchQuery.toLowerCase()) || user.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Modal and form handling
+  const handleAddUserClick = () => setShowModal(true);
   const handleCloseModal = () => {
     setShowModal(false);
+    resetNewUserForm();
+  };
+
+  const resetNewUserForm = () => {
     setNewUser({
       name: "",
       email: "",
       mobile: "",
       designation: "",
       courses: [],
+      gender: "",
       profileImage: null,
     });
+  };
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 5;
+
+  // Calculate paginated data
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const currentRows = filteredEmployees.slice(indexOfFirstRow, indexOfLastRow);
+
+  const totalPages = Math.ceil(filteredEmployees.length / rowsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
       await addUser(newUser);
-      fetchEmployees();
-      alert("User added successfully!"); // Success alert
+      setUsers((prevUsers) => [...prevUsers, newUser]); // Optimistically update the user list
+      alert("User added successfully!");
       setShowModal(false);
-      setNewUser({
-        name: "",
-        email: "",
-        mobile: "",
-        designation: "",
-        courses: [],
-        profileImage: null,
-      });
+      resetNewUserForm();
     } catch (error) {
-      alert("Failed to add user. Please try again."); // Error alert
+      alert("Failed to add user. Please try again.");
     }
   };
 
@@ -99,21 +118,41 @@ function AdminDashboard() {
   };
 
   const handleCourseChange = (e) => {
-    const { value } = e.target;
+    const { value, checked } = e.target;
     setNewUser((prevState) => {
-      const updatedCourses = prevState.courses.includes(value)
-        ? prevState.courses.filter((course) => course !== value)
-        : [...prevState.courses, value];
+      const updatedCourses = checked
+        ? [...prevState.courses, value]
+        : prevState.courses.filter((course) => course !== value);
       return { ...prevState, courses: updatedCourses };
     });
   };
 
-  const handleFileChange = (e) => {
+  const handleGenderChange = (e) => {
+    const { value } = e.target;
     setNewUser((prevState) => ({
       ...prevState,
-      profileImage: e.target.files[0],
+      gender: value,
     }));
   };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+        alert("Only JPG, JPEG, and PNG files are allowed.");
+        return;
+      }
+      if (file.size > MAX_IMAGE_SIZE) {
+        alert("File size should not exceed 2 MB.");
+        return;
+      }
+      setNewUser((prevState) => ({
+        ...prevState,
+        profileImage: file,
+      }));
+    }
+  };
+  
 
   return (
     <div className="dashboard-container">
@@ -145,23 +184,184 @@ function AdminDashboard() {
         </button>
       </div>
 
-      <div className="employee-list">
+      {/* <div className="employee-list">
         <h2>Employees</h2>
-        <ul>
-          {filteredEmployees?.length > 0 ? (
-            filteredEmployees.map((emp, index) => (
-              <li key={index}>
-                <span>
-                  <b>{index + 1} {". "}</b>
-                </span>
-                <span>{emp.name}</span> - <span>{emp.email}</span>
-              </li>
+        {loading && <p>Loading...</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        {!loading && !error && (
+          <ul>
+            {filteredEmployees.length > 0 ? (
+              filteredEmployees.map((user, index) => (
+                <li key={index}>
+                  <span>{user.name}</span> - <span>{user.email}</span> - <span>{user.mobile}</span>- <span>{user.course}</span> 
+                  <span>{user.designation}</span> - <span>{user.profileImage}</span> - <span><img src={user.profileImage} ></img></span>
+                </li>
+              ))
+            ) : (
+              <li>No employees found</li>
+            )}
+          </ul>
+        )}
+      </div> */}
+          {/* <div className="employee-list">
+      <h2>Employees</h2>
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {!loading && !error && (
+        <>
+          <table border="1" style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr>
+              <th>Profile Image</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Mobile</th>
+                <th>Course</th>
+                <th>Designation</th>
+                
+              </tr>
+            </thead>
+            <tbody>
+              {currentRows.length > 0 ? (
+                currentRows.map((user, index) => (
+                  <tr key={index}>
+                    <td>
+                      <img
+                        src={user.profileImage}
+                        alt="Profile"
+                        style={{ width: "50px", height: "50px", borderRadius: "50%" }}
+                      />
+                    </td>
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
+                    <td>{user.mobile}</td>
+                    <td>{user.course}</td>
+                    <td>{user.designation}</td>
+                    
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: "center" }}>
+                    No employees found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+          <div style={{ marginTop: "10px", textAlign: "center" }}>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                style={{
+                  margin: "0 5px",
+                  padding: "5px 10px",
+                  backgroundColor: page === currentPage ? "#007BFF" : "#FFF",
+                  color: page === currentPage ? "#FFF" : "#000",
+                  border: "1px solid #CCC",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div> */}
+    <div className="employee-list">
+  <h2>Employees</h2>
+  {loading && <p>Loading...</p>}
+  {error && <p style={{ color: "red" }}>{error}</p>}
+  {!loading && !error && (
+    <>
+      <table border="1" style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th>Profile Image</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>Course</th>
+            <th>Designation</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentRows.length > 0 ? (
+            currentRows.map((user, index) => (
+              <tr key={index}>
+                <td>
+                  {user.profileImage ? (
+                    <img
+                      src={user.profileImage}
+                      alt="Profile"
+                      style={{
+                        width: "50px",
+                        height: "50px",
+                        borderRadius: "50%",
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: "50px",
+                        height: "50px",
+                        borderRadius: "50%",
+                        backgroundColor: "#007BFF",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#FFF",
+                        fontWeight: "bold",
+                        fontSize: "20px",
+                      }}
+                    >
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </td>
+                <td>{user.name}</td>
+                <td>{user.email}</td>
+                <td>{user.mobile}</td>
+                <td>{user.course}</td>
+                <td>{user.designation}</td>
+              </tr>
             ))
           ) : (
-            <li>No employees found</li>
+            <tr>
+              <td colSpan="6" style={{ textAlign: "center" }}>
+                No employees found
+              </td>
+            </tr>
           )}
-        </ul>
+        </tbody>
+      </table>
+      <div style={{ marginTop: "10px", textAlign: "center" }}>
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          <button
+            key={page}
+            onClick={() => handlePageChange(page)}
+            style={{
+              margin: "0 5px",
+              padding: "5px 10px",
+              backgroundColor: page === currentPage ? "#007BFF" : "#FFF",
+              color: page === currentPage ? "#FFF" : "#000",
+              border: "1px solid #CCC",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            {page}
+          </button>
+        ))}
       </div>
+    </>
+  )}
+</div>
+
+  
 
       {showModal && (
         <div className="modal-overlay">
@@ -178,7 +378,6 @@ function AdminDashboard() {
                   required
                 />
               </div>
-
               <div className="input-container">
                 <input
                   type="email"
@@ -189,19 +388,34 @@ function AdminDashboard() {
                   required
                 />
               </div>
-
               <div className="input-container">
                 <input
                   type="tel"
                   placeholder="Mobile Number"
                   name="mobile"
-                  value={newUser.mobile}
+                  value={newUser.mobile || ""}
                   onChange={handleInputChange}
                   pattern="[0-9]{10}"
                   required
-                  maxLength="10"
-                  title="Please enter a valid 10-digit mobile number"
                 />
+              </div>
+
+              <div className="course-section">
+                <label>Courses</label>
+                <div className="input-courses">
+                  {["React", "Node", "MongoDB"].map((course) => (
+                    <div className="course-name" key={course}>
+                      <input
+                        type="checkbox"
+                        id={course}
+                        value={course}
+                        checked={newUser.courses.includes(course)}
+                        onChange={handleCourseChange}
+                      />
+                      <label htmlFor={course}>{course}</label>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div className="input-container">
@@ -212,46 +426,10 @@ function AdminDashboard() {
                   required
                 >
                   <option value="">Select Designation</option>
-                  <option value="Hr">Hr</option>
+                  <option value="Hr">HR</option>
                   <option value="Manager">Manager</option>
                   <option value="Sales">Sales</option>
                 </select>
-              </div>
-
-              <div className="course-section">
-                <label>Courses</label>
-                <div className="input-courses">
-                  <div className="course-name">
-                    <input
-                      type="checkbox"
-                      id="react"
-                      value="React"
-                      checked={newUser.courses.includes("React")}
-                      onChange={handleCourseChange}
-                    />
-                    <label htmlFor="react">React</label>
-                  </div>
-                  <div className="course-name">
-                    <input
-                      type="checkbox"
-                      id="nodejs"
-                      value="Node"
-                      checked={newUser.courses.includes("Node")}
-                      onChange={handleCourseChange}
-                    />
-                    <label htmlFor="nodejs">Node.js</label>
-                  </div>
-                  <div className="course-name">
-                    <input
-                      type="checkbox"
-                      id="mongodb"
-                      value="MongoDB"
-                      checked={newUser.courses.includes("MongoDB")}
-                      onChange={handleCourseChange}
-                    />
-                    <label htmlFor="mongodb">MongoDB</label>
-                  </div>
-                </div>
               </div>
 
               <div className="gender-section">
@@ -262,7 +440,8 @@ function AdminDashboard() {
                     id="male"
                     name="gender"
                     value="male"
-                    onChange={handleInputChange}
+                    checked={newUser.gender === "male"}
+                    onChange={handleGenderChange}
                   />
                   <label htmlFor="male">Male</label>
                 </div>
@@ -272,7 +451,8 @@ function AdminDashboard() {
                     id="female"
                     name="gender"
                     value="female"
-                    onChange={handleInputChange}
+                    checked={newUser.gender === "female"}
+                    onChange={handleGenderChange}
                   />
                   <label htmlFor="female">Female</label>
                 </div>
@@ -284,7 +464,7 @@ function AdminDashboard() {
                   type="file"
                   name="profileImage"
                   onChange={handleFileChange}
-                  accept="image/*"
+                  accept="image/jpeg, image/png, image/jpg"
                 />
               </div>
 

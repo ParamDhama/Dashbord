@@ -7,7 +7,7 @@ const loginRoutes = require('./login'); // Ensure file paths are correct
 const { authenticateToken } = require('../middleware/middleware');
 
 // Define the /signup route
-router.use('/signup', authenticateToken, signupControllerRoutes);
+router.use('/signup',authenticateToken,  signupControllerRoutes);
 
 // Define the /login route
 router.use('/login', loginRoutes.login);

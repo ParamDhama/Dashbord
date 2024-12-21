@@ -57,6 +57,7 @@ export const addUser = async (data) => {
       },
     });
     console.log("API response:", response.data); // Debug log
+    
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -65,31 +66,122 @@ export const addUser = async (data) => {
   }
 };
 
+// export const fetchUsers = async (queryParams = {}) => {
+//   try {
+//     const token = localStorage.getItem("authToken");
+//     if (!token) {
+//       throw new Error("Authorization token is missing");
+//     }
+
+//     // Transform queryParams into a query string
+//     const queryString = new URLSearchParams(queryParams).toString();
+//     const endpointWithParams = `${endpoints.GET_USER}?${queryString}`;
+
+//     // Set the Authorization header
+//     const response = await apiClient.get(endpointWithParams, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+//     if(response) {
+//       return response;
+//     }
+//   } catch (error) {
+//     if (error.response) {
+//       console.error("Server Error in fetch users:", error.response.data);
+//     } else {
+//       console.error("Error in fetch users:", error.message);
+//     }
+//   }
+// };
 export const fetchUsers = async (queryParams = {}) => {
+  try {
+    const token = localStorage.getItem("authToken");
+
+    // Validate token existence
+    if (!token) {
+      throw new Error("Authorization token is missing");
+    }
+
+    // Construct query string from queryParams
+    const queryString = new URLSearchParams(queryParams).toString();
+    const endpointWithParams = `${endpoints.GET_USER}?${queryString}`;
+
+    // Make API request with Authorization header
+    const response = await apiClient.get(endpointWithParams, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    // Return data if response is successful
+    return response?.data || [];
+  } catch (error) {
+    // Log server-side errors
+    if (error.response) {
+      console.error(
+        "Server Error in fetchUsers:",
+        error.response.status,
+        error.response.data
+      );
+      throw new Error(error.response.data?.message || "Failed to fetch users.");
+    }
+
+    // Log other errors
+    console.error("Error in fetchUsers:", error.message);
+    throw new Error("An error occurred while fetching users.");
+  }
+};
+
+export const updateUser = async (userId, updatedData) => {
   try {
     const token = localStorage.getItem("authToken");
     if (!token) {
       throw new Error("Authorization token is missing");
     }
 
-    // Transform queryParams into a query string
-    const queryString = new URLSearchParams(queryParams).toString();
-    const endpointWithParams = `${endpoints.GET_USER}?${queryString}`;
+    const endpoint = `${endpoints.UPDATE_USER}/${userId}`;
 
-    // Set the Authorization header
-    const response = await apiClient.get(endpointWithParams, {
+    const response = await apiClient.put(endpoint, updatedData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    if(response) {
-      return response;
+
+    if (response) {
+      return response.data;
     }
   } catch (error) {
     if (error.response) {
-      console.error("Server Error in fetch users:", error.response.data);
+      console.error("Server Error in update user:", error.response.data);
     } else {
-      console.error("Error in fetch users:", error.message);
+      console.error("Error in update user:", error.message);
+    }
+  }
+};
+export const deleteUser = async (userId) => {
+  try {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      throw new Error("Authorization token is missing");
+    }
+
+    const endpoint = `${endpoints.DELETE_USER}/${userId}`;
+
+    const response = await apiClient.delete(endpoint, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response) {
+      return response.data;
+    }
+  } catch (error) {
+    if (error.response) {
+      console.error("Server Error in delete user:", error.response.data);
+    } else {
+      console.error("Error in delete user:", error.message);
     }
   }
 };
