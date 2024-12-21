@@ -49,15 +49,7 @@ exports.createEmployee = async (req, res) => {
 // Get Employees List (with search and pagination)
 exports.getEmployees = async (req, res) => {
   try {
-    const { search = '', page = 1, limit = 10 } = req.query;
-
-    // Validate pagination inputs
-    const pageNum = parseInt(page, 10);
-    const limitNum = parseInt(limit, 10);
-
-    if (isNaN(pageNum) || isNaN(limitNum) || pageNum <= 0 || limitNum <= 0) {
-      return res.status(400).json({ error: 'Invalid pagination parameters' });
-    }
+    const { search = '' } = req.query;
 
     // Search query based on input
     const query = search
@@ -69,22 +61,18 @@ exports.getEmployees = async (req, res) => {
         }
       : {};
 
-    const employees = await Employee.find(query)
-      .skip((pageNum - 1) * limitNum)
-      .limit(limitNum);
-
-    const total = await Employee.countDocuments(query);
+    // Fetch all employees matching the query
+    const employees = await Employee.find(query);
 
     res.status(200).json({
       employees,
-      total,
-      page: pageNum,
-      totalPages: Math.ceil(total / limitNum),
+      total: employees.length, // Total employees count
     });
   } catch (error) {
     res.status(500).json({ error: `Error fetching employees: ${error.message}` });
   }
 };
+
 
 // Get Employee by ID
 exports.getEmployeeById = async (req, res) => {

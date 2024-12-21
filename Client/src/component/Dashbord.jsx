@@ -22,7 +22,7 @@ function AdminDashboard() {
     email: "",
     mobile: "",
     designation: "",
-    courses: [],
+    courses: "",
     gender: "",
     profileImage: null,
   });
@@ -36,17 +36,30 @@ function AdminDashboard() {
     navigate("/login");
   };
 
-  // Fetch users on component mount
   useEffect(() => {
-    const getUsers = async () => {
+    const fetchAndValidateUsers = async () => {
       try {
         setLoading(true);
+  
+        // Fetch users from API
         const response = await fetchUsers();
-        console.log("API Response:", response.employees); // Log response for debugging
+        console.log("API Response:", response); // Log response for debugging
+  
         if (response && response.employees) {
-          setUsers(response.employees); // Assuming `response.data.employees` contains an array of user objects
+          const fetchedUsers = response.employees;
+  
+          // Validate profile images and update the user objects
+          const updatedUsers = await Promise.all(
+            fetchedUsers.map(async (user) => {
+              const isValid = await checkImageUrl(user.profileImage);
+              return { ...user, isValidProfileImage: isValid };
+            })
+          );
+  
+          // Update the users state with validated data
+          setUsers(updatedUsers);
         } else {
-          setUsers([]); // No employees found
+          setUsers([]);
         }
       } catch (err) {
         setError("Failed to fetch users. Please try again.");
@@ -55,9 +68,26 @@ function AdminDashboard() {
         setLoading(false);
       }
     };
+  
+    fetchAndValidateUsers();
+  }, []); // Run effect only once
+  
 
-    getUsers();
-  }, []);
+  const checkImageUrl = async (url) => {
+    if (!url) return false;
+  
+    try {
+      // Send a request to the image URL to check if it's valid
+      const response = await fetch(url);
+  
+      // Return true if the response status is 200 (OK)
+      return response.ok;
+    } catch (error) {
+      // Handle network or other errors
+      console.error(`Error checking URL ${url}:`, error);
+      return false;
+    }
+  };
 
   // Search filter logic
   const filteredEmployees = users.filter(
@@ -119,13 +149,11 @@ function AdminDashboard() {
 
   const handleCourseChange = (e) => {
     const { value, checked } = e.target;
-    setNewUser((prevState) => {
-      const updatedCourses = checked
-        ? [...prevState.courses, value]
-        : prevState.courses.filter((course) => course !== value);
-      return { ...prevState, courses: updatedCourses };
-    });
+    console.log("Value:", value, "Checked:", checked);
+  
+    setNewUser((prevState) =>{return { ...prevState, courses: value }});
   };
+  
 
   const handleGenderChange = (e) => {
     const { value } = e.target;
@@ -184,93 +212,7 @@ function AdminDashboard() {
         </button>
       </div>
 
-      {/* <div className="employee-list">
-        <h2>Employees</h2>
-        {loading && <p>Loading...</p>}
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        {!loading && !error && (
-          <ul>
-            {filteredEmployees.length > 0 ? (
-              filteredEmployees.map((user, index) => (
-                <li key={index}>
-                  <span>{user.name}</span> - <span>{user.email}</span> - <span>{user.mobile}</span>- <span>{user.course}</span> 
-                  <span>{user.designation}</span> - <span>{user.profileImage}</span> - <span><img src={user.profileImage} ></img></span>
-                </li>
-              ))
-            ) : (
-              <li>No employees found</li>
-            )}
-          </ul>
-        )}
-      </div> */}
-          {/* <div className="employee-list">
-      <h2>Employees</h2>
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {!loading && !error && (
-        <>
-          <table border="1" style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-              <th>Profile Image</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Mobile</th>
-                <th>Course</th>
-                <th>Designation</th>
-                
-              </tr>
-            </thead>
-            <tbody>
-              {currentRows.length > 0 ? (
-                currentRows.map((user, index) => (
-                  <tr key={index}>
-                    <td>
-                      <img
-                        src={user.profileImage}
-                        alt="Profile"
-                        style={{ width: "50px", height: "50px", borderRadius: "50%" }}
-                      />
-                    </td>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>{user.mobile}</td>
-                    <td>{user.course}</td>
-                    <td>{user.designation}</td>
-                    
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="6" style={{ textAlign: "center" }}>
-                    No employees found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          <div style={{ marginTop: "10px", textAlign: "center" }}>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                style={{
-                  margin: "0 5px",
-                  padding: "5px 10px",
-                  backgroundColor: page === currentPage ? "#007BFF" : "#FFF",
-                  color: page === currentPage ? "#FFF" : "#000",
-                  border: "1px solid #CCC",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
-              >
-                {page}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </div> */}
+      
     <div className="employee-list">
   <h2>Employees</h2>
   {loading && <p>Loading...</p>}
@@ -293,39 +235,39 @@ function AdminDashboard() {
             currentRows.map((user, index) => (
               <tr key={index}>
                 <td>
-                  {user.profileImage ? (
-                    <img
-                      src={user.profileImage}
-                      alt="Profile"
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        borderRadius: "50%",
-                      }}
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        borderRadius: "50%",
-                        backgroundColor: "#007BFF",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "#FFF",
-                        fontWeight: "bold",
-                        fontSize: "20px",
-                      }}
-                    >
-                      {user.name.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                </td>
+  {user.isValidProfileImage ? (
+    <img
+      src={user.profileImage}
+      alt="Profile"
+      style={{
+        width: "50px",
+        height: "50px",
+        borderRadius: "50%",
+      }}
+    />
+  ) : (
+    <div
+      style={{
+        width: "50px",
+        height: "50px",
+        borderRadius: "50%",
+        backgroundColor: "#007BFF",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#FFF",
+        fontWeight: "bold",
+        fontSize: "20px",
+      }}
+    >
+      {user.name[0].toUpperCase()}
+    </div>
+  )}
+</td>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>{user.mobile}</td>
-                <td>{user.course}</td>
+                <td>{[user.courses]}</td>
                 <td>{user.designation}</td>
               </tr>
             ))
