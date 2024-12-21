@@ -15,7 +15,7 @@ const employeeSchema = new mongoose.Schema({
   mobile: { type: Number, required: true },
   designation: { type: String, required: true, enum: ['Hr', 'Manager', 'Sales'] },
   gender: { type: String, required: true },
-  course: {type: String, required: true},
+  course: [String],
 });
 
 // Add the base schema fields
