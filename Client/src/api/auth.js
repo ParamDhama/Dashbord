@@ -65,35 +65,6 @@ export const addUser = async (data) => {
     }
   }
 };
-
-// export const fetchUsers = async (queryParams = {}) => {
-//   try {
-//     const token = localStorage.getItem("authToken");
-//     if (!token) {
-//       throw new Error("Authorization token is missing");
-//     }
-
-//     // Transform queryParams into a query string
-//     const queryString = new URLSearchParams(queryParams).toString();
-//     const endpointWithParams = `${endpoints.GET_USER}?${queryString}`;
-
-//     // Set the Authorization header
-//     const response = await apiClient.get(endpointWithParams, {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
-//     if(response) {
-//       return response;
-//     }
-//   } catch (error) {
-//     if (error.response) {
-//       console.error("Server Error in fetch users:", error.response.data);
-//     } else {
-//       console.error("Error in fetch users:", error.message);
-//     }
-//   }
-// };
 export const fetchUsers = async (queryParams = {}) => {
   try {
     const token = localStorage.getItem("authToken");
