@@ -11,7 +11,7 @@ const employeeSchema = new mongoose.Schema({
   },
   profileImage: { type: String },
   name: { type: String, required: true },
-  email: { type: String, required: true, lowercase: true },
+  email: { type: String, required: true, lowercase: true, unique: true }, 
   mobile: { type: Number, required: true },
   designation: { type: String, required: true, enum: ['Hr', 'Manager', 'Sales'] },
   gender: { type: String, required: true },

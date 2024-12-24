@@ -56,9 +56,9 @@ export const addUser = async (data) => {
         'Content-Type': 'multipart/form-data',
       },
     });
-    console.log("API response:", response.data); // Debug log
+    console.log("API response:", response); // Debug log
     
-    return response.data;
+    return response;
   } catch (error) {
     if (error.response) {
       console.error("Server Error in add user:", error.response.data);

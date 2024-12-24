@@ -2,6 +2,25 @@ const Employee = require('../models/singup'); // Employee model
 const cloudinary = require('../config/cloudinaryconnection'); // Cloudinary configuration
 const { v4: uuidv4 } = require('uuid'); // UUID for unique employee IDs
 
+const checkEmailUniqueness = async (email) => {
+  
+  try {
+    // Check if the email exists in the Employee collection
+    const existingEmployee = await Employee.findOne({ email: email.toLowerCase() });
+     console.log(existingEmployee);
+    if (existingEmployee) {
+      // If email exists, return a response indicating it's not unique
+      return false;
+    }
+
+    // If email doesn't exist, it's unique
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
 // Helper function: Upload image to Cloudinary
 const uploadImage = async (file) => {
   if (!file) return '';
@@ -23,7 +42,10 @@ const findEmployeeById = async (id) => {
 exports.createEmployee = async (req, res) => {
   try {
     const { name, email, mobile, designation, gender, course } = req.body;
-
+    const checkEmail = await checkEmailUniqueness(email);
+     if(!checkEmail){
+      return res.status(409).json({ error: 'Email already exists' });
+     }
     // Upload image if provided
     const profileImage = req.file ? await uploadImage(req.file) : '';
 
@@ -73,6 +95,10 @@ exports.getEmployees = async (req, res) => {
   }
 };
 
+
+//Get Unique email ID for all employees
+
+ 
 
 // Get Employee by ID
 exports.getEmployeeById = async (req, res) => {

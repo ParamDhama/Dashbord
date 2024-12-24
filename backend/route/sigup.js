@@ -55,6 +55,7 @@ const {
   getEmployeeById,
   updateEmployee,
   deleteEmployee,
+  checkEmailUniqueness
 } = require('../controller/employee'); // Import employee controller functions
 const { upload, handleUploadErrors } = require('../middleware/multer'); // Import multer middleware for file uploads
 
@@ -91,6 +92,13 @@ router.get('/employees/:id', getEmployeeById);
  * @desc    Update an employee's information, including profile image
  * @access  Public
  */
+
+
+// Route to check email uniqueness
+
+
+
+
 router.put(
   '/employees/:id',
   upload.single('profileImage'), // Handle single file upload

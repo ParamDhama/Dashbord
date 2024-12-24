@@ -129,9 +129,10 @@ function AdminDashboard() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
-      await addUser(newUser);
+      const res =  await addUser(newUser);
+      console.log("API Response:", res); // Log response for debugging
+      if(res.data == "email is already in use")
       setUsers((prevUsers) => [...prevUsers, newUser]); // Optimistically update the user list
-      alert("User added successfully!");
       setShowModal(false);
       resetNewUserForm();
     } catch (error) {
