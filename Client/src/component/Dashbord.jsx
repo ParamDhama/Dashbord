@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 import { addUser, fetchUsers } from "../api/auth";
+import Aleart from "./Aleart";
 
 // Dummy data for the search feature (for local testing)
 const employees = [
@@ -17,6 +18,8 @@ function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [profileImage, setProfileImage] = useState("https://via.placeholder.com/40");
   const [showModal, setShowModal] = useState(false);
+  const [isAleart, setIsAleart] = useState(false);
+  const [aleartMessage,setAleartMessage] = useState("No");
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
@@ -30,6 +33,14 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(""); // Error state
   const navigate = useNavigate();
+
+const handleAleart = () => {
+  setIsAleart(true);
+  setTimeout(() => {
+    setIsAleart(false);
+  }, 5000);
+}
+
 
   // Logout function
   const handleLogout = () => {
@@ -130,11 +141,22 @@ function AdminDashboard() {
     e.preventDefault();
     try {
       const res =  await addUser(newUser);
-      console.log("API Response:", res); // Log response for debugging
-      if(res.data == "email is already in use")
-      setUsers((prevUsers) => [...prevUsers, newUser]); // Optimistically update the user list
-      setShowModal(false);
-      resetNewUserForm();
+      console.log("API Response:", res.data); // Log response for debugging
+      if(res.status == 409)
+      {
+        // alert(res.data.error)
+        handleAleart();
+        setAleartMessage(res.data.error);
+        resetNewUserForm();
+      }
+      else
+      {
+        setShowModal(false);
+        setUsers((prevUsers) => [...prevUsers, newUser]); // Optimistically update the user list
+        resetNewUserForm();
+      }
+
+
     } catch (error) {
       alert("Failed to add user. Please try again.");
     }
@@ -185,6 +207,9 @@ function AdminDashboard() {
 
   return (
     <div className="dashboard-container">
+      <div style={{position:'absolute'}}>
+        {isAleart&&  <Aleart message={aleartMessage}/>}
+      </div>
       <nav className="navbar">
         <div className="navbar-left">
           <div className="logo">Admin Dashboard</div>
