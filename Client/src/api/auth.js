@@ -48,7 +48,6 @@ export const addUser = async (data) => {
     if (!token) {
       throw new Error("Authorization token is missing");
     }
-
     // Set the Authorization header
     const response = await apiClient.post(endpoints.ADD_USER, data, {
       headers: {
@@ -62,6 +61,7 @@ export const addUser = async (data) => {
   } catch (error) {
     if (error.response) {
       console.error("Server Error in add user:", error.response.data);
+      return error.response;
     }
   }
 };
