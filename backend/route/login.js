@@ -8,7 +8,7 @@ exports.login = async (req, res) => {
   try {
     const value = encryptPassword(passwordValue);
     const user = await login.findOne({ userName, password: value });
-    console.log(userName, value);
+    
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
@@ -31,7 +31,7 @@ exports.signup = async (req, res) => {
   try {
     // Check if the user already exists
     const existingUser = await login.findOne({ $or: [{ userName }] });
-    console.log(existingUser);
+    
     if (existingUser) {
       return res.status(400).json({ message: 'Username or email already exists' });
     }

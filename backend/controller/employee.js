@@ -7,7 +7,7 @@ const checkEmailUniqueness = async (email) => {
   try {
     // Check if the email exists in the Employee collection
     const existingEmployee = await Employee.findOne({ email: email.toLowerCase() });
-     console.log(existingEmployee);
+     
     if (existingEmployee) {
       // If email exists, return a response indicating it's not unique
       return false;
